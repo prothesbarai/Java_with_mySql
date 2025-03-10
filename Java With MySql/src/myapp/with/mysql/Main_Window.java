@@ -4,15 +4,21 @@
  */
 package myapp.with.mysql;
 
+import com.sun.jdi.connect.spi.Connection;
+
 /**
  *
  * @author Asp Prothes
  */
 public class Main_Window extends javax.swing.JFrame {
-
-    /**
-     * Creates new form Main_Window
-     */
+    
+    // Set Sql Connection
+    public Connection getConnection(){
+        Connection conn = null;
+        return null;
+        
+    }
+    
     public Main_Window() {
         initComponents();
     }
