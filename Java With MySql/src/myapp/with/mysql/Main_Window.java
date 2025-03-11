@@ -1,10 +1,13 @@
+package myapp.with.mysql;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package myapp.with.mysql;
 
-import com.sun.jdi.connect.spi.Connection;
 
 /**
  *
@@ -15,12 +18,22 @@ public class Main_Window extends javax.swing.JFrame {
     // Set Sql Connection
     public Connection getConnection(){
         Connection conn = null;
-        return null;
-        
+        String url = "jdbc:mysql://localhost/xiaomi";
+        String user = "root";
+        String password = "";
+        try{
+            conn = DriverManager.getConnection(url,user,password);
+            JOptionPane.showMessageDialog(null, "Connected");
+            return conn;
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(null, "Not Connected");
+            return null;
+        }
     }
     
     public Main_Window() {
         initComponents();
+        getConnection();
     }
 
     /**
