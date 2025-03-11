@@ -183,6 +183,11 @@ public class Main_Window extends javax.swing.JFrame {
 
         updateBtn.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         updateBtn.setText("Update");
+        updateBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateBtnActionPerformed(evt);
+            }
+        });
 
         deleteBtn.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         deleteBtn.setText("Delete");
@@ -326,6 +331,8 @@ public class Main_Window extends javax.swing.JFrame {
         
     }//GEN-LAST:event_idTextFieldActionPerformed
 
+    
+    // Insert button
     private void insertBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertBtnActionPerformed
         if(checkInputs() && ImagePath != null){
             try {
@@ -350,6 +357,22 @@ public class Main_Window extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "One or More Field Are Empty");
         }
     }//GEN-LAST:event_insertBtnActionPerformed
+
+    
+    
+    // Update Button
+    private void updateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateBtnActionPerformed
+        if(checkInputs() && ImagePath != null){
+            String UpdateQuery = null;
+            PreparedStatement ps = null;
+            Connection conn = getConnection();
+            if(){
+                
+            }
+            
+            
+        }
+    }//GEN-LAST:event_updateBtnActionPerformed
 
     /**
      * @param args the command line arguments
