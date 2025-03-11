@@ -1,5 +1,4 @@
 package myapp.with.mysql;
-
 import com.mysql.jdbc.PreparedStatement;
 import java.awt.HeadlessException;
 import java.awt.Image;
@@ -67,6 +66,20 @@ public class Main_Window extends javax.swing.JFrame {
                 Float.valueOf(priceTextField.getText());
                 return true;
             } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+    }
+    
+    // Check Input
+    public boolean checkThreeField(){
+        if(idTextField.getText() == null && nameTextField.getText() == null && priceTextField.getText() == null){
+            return false;
+        }else{
+            try{
+                Float.valueOf(priceTextField.getText());
+                return true;
+            }catch(NumberFormatException e){
                 return false;
             }
         }
@@ -186,6 +199,11 @@ public class Main_Window extends javax.swing.JFrame {
 
         deleteBtn.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         deleteBtn.setText("Delete");
+        deleteBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteBtnActionPerformed(evt);
+            }
+        });
 
         firstBtn.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         firstBtn.setText("First");
@@ -320,7 +338,7 @@ public class Main_Window extends javax.swing.JFrame {
 
 
     private void idTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idTextFieldActionPerformed
-
+        
     }//GEN-LAST:event_idTextFieldActionPerformed
 
     // Insert button
@@ -393,6 +411,37 @@ public class Main_Window extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "One or More Fields are Empty Or Wrong");
         }
     }//GEN-LAST:event_updateBtnActionPerformed
+
+    
+    
+    
+    // Delete Data From table
+    private void deleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtnActionPerformed
+        if (checkThreeField()) {
+            String DeleteQuery = null;
+            PreparedStatement ps = null;
+            Connection conn = getConnection();
+            try {
+                    DeleteQuery = "DELETE FROM products WHERE id = ? AND name = ? AND price = ?";
+                    ps = (PreparedStatement) conn.prepareStatement(DeleteQuery);
+//                    ps.setString(1, nameTextField.getText());
+//                    ps.setString(2, priceTextField.getText());
+//                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//                    String addDate = dateFormat.format(dateField.getDate());
+//                    ps.setString(3, addDate);
+                    ps.setInt(1, Integer.parseInt(idTextField.getText()));
+                    ps.setString(2, nameTextField.getText());
+                    ps.setString(3, priceTextField.getText());
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Delete Successfully");
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                }
+
+        }else{
+            JOptionPane.showMessageDialog(null, "One or More Fields are Empty Or Wrong");
+        }
+    }//GEN-LAST:event_deleteBtnActionPerformed
 
     /**
      * @param args the command line arguments
