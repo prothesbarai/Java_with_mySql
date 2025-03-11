@@ -1,4 +1,5 @@
 package myapp.with.mysql;
+
 import com.mysql.jdbc.PreparedStatement;
 import java.awt.HeadlessException;
 import java.awt.Image;
@@ -14,44 +15,41 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
-
 /**
  *
  * @author Asp Prothes
  */
 public class Main_Window extends javax.swing.JFrame {
-    
+
     String ImagePath = null;
-    
+
     // Set Sql Connection
-    public Connection getConnection(){
+    public Connection getConnection() {
         Connection conn = null;
         String url = "jdbc:mysql://localhost/javawithmysql";
         String user = "root";
         String password = "";
-        try{
-            conn = DriverManager.getConnection(url,user,password);
+        try {
+            conn = DriverManager.getConnection(url, user, password);
             JOptionPane.showMessageDialog(null, "Connected");
             return conn;
-        }catch(SQLException e){
+        } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Not Connected");
             return null;
         }
     }
-    
-    
-    
+
     // Resize Images ================
-    public ImageIcon ResizeImage(String imagePath, byte[] pic){
+    public ImageIcon ResizeImage(String imagePath, byte[] pic) {
         ImageIcon myImg = null;
-        if(imagePath != null){
+        if (imagePath != null) {
             myImg = new ImageIcon(imagePath);
-        }else{
+        } else {
             myImg = new ImageIcon(pic);
         }
         Image img = myImg.getImage();
@@ -59,24 +57,21 @@ public class Main_Window extends javax.swing.JFrame {
         ImageIcon image = new ImageIcon(img2);
         return image;
     }
-    
-    
+
     // Check Input FIelds
-    public boolean checkInputs(){
-        if(idTextField.getText() == null || nameTextField.getText() == null || priceTextField.getText() == null || dateField.getDate() == null){
+    public boolean checkInputs() {
+        if (idTextField.getText() == null || nameTextField.getText() == null || priceTextField.getText() == null || dateField.getDate() == null) {
             return false;
-        }else{
-            try{
-               Float.valueOf(priceTextField.getText());
-               return true;
-            }catch(NumberFormatException e){
+        } else {
+            try {
+                Float.valueOf(priceTextField.getText());
+                return true;
+            } catch (NumberFormatException e) {
                 return false;
             }
         }
     }
-    
-    
-    
+
     public Main_Window() {
         initComponents();
         // This Method Write here check connected database purpose
@@ -309,32 +304,28 @@ public class Main_Window extends javax.swing.JFrame {
     private void chooseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseBtnActionPerformed
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-        
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("*.images", "jpg","png");
+
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("*.images", "jpg", "png");
         fileChooser.addChoosableFileFilter(filter);
         int result = fileChooser.showSaveDialog(null);
-        if(result == JFileChooser.APPROVE_OPTION){
+        if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             String path = selectedFile.getAbsolutePath();
             imgBox.setIcon(ResizeImage(path, null));
             ImagePath = path;
-        }else{
+        } else {
             System.out.println("No File Selected");
         }
     }//GEN-LAST:event_chooseBtnActionPerformed
 
-    
-    
-    
-    
+
     private void idTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idTextFieldActionPerformed
-        
+
     }//GEN-LAST:event_idTextFieldActionPerformed
 
-    
     // Insert button
     private void insertBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertBtnActionPerformed
-        if(checkInputs() && ImagePath != null){
+        if (checkInputs() && ImagePath != null) {
             try {
                 Connection conn = getConnection();
                 PreparedStatement ps = (PreparedStatement) conn.prepareStatement("INSERT INTO products(id,name,price,add_date,image)"
@@ -348,29 +339,58 @@ public class Main_Window extends javax.swing.JFrame {
                 InputStream img = new FileInputStream(new File(ImagePath));
                 ps.setBlob(5, img);
                 ps.executeUpdate();
-                
+
                 JOptionPane.showMessageDialog(null, "Data Inserted");
             } catch (HeadlessException | FileNotFoundException | SQLException ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage());
             }
-        }else{
+        } else {
             JOptionPane.showMessageDialog(null, "One or More Field Are Empty");
         }
     }//GEN-LAST:event_insertBtnActionPerformed
 
-    
-    
     // Update Button
     private void updateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateBtnActionPerformed
-        if(checkInputs() && ImagePath != null){
+        if (checkInputs() && ImagePath != null) {
             String UpdateQuery = null;
             PreparedStatement ps = null;
             Connection conn = getConnection();
-            if(){
-                
+            if (ImagePath == null) {
+                try {
+                    UpdateQuery = "UPDATE products SET name = ?, price = ?" + ", add_date = ? WHERE id = ?";
+                    ps = (PreparedStatement) conn.prepareStatement(UpdateQuery);
+                    ps.setString(1, nameTextField.getText());
+                    ps.setString(2, priceTextField.getText());
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String addDate = dateFormat.format(dateField.getDate());
+                    ps.setString(3, addDate);
+                    ps.setInt(4, Integer.parseInt(idTextField.getText()));
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Update Successfully");
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                }
+            }else{
+                try {
+                    InputStream img = new FileInputStream(new File(ImagePath));
+                    UpdateQuery = "UPDATE products SET name = ?, price = ?" + ", add_date = ?, image = ? WHERE id = ?";
+                    ps = (PreparedStatement) conn.prepareStatement(UpdateQuery);
+                    ps.setString(1, nameTextField.getText());
+                    ps.setString(2, priceTextField.getText());
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String addDate = dateFormat.format(dateField.getDate());
+                    ps.setString(3, addDate);
+                    ps.setBlob(4, img);
+                    ps.setInt(5, Integer.parseInt(idTextField.getText()));
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Update Successfully");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                }
             }
-            
-            
+
+        }else{
+            JOptionPane.showMessageDialog(null, "One or More Fields are Empty Or Wrong");
         }
     }//GEN-LAST:event_updateBtnActionPerformed
 
