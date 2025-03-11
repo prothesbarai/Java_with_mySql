@@ -1,8 +1,20 @@
 package myapp.with.mysql;
+import com.mysql.jdbc.PreparedStatement;
+import java.awt.Image;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -15,10 +27,12 @@ import javax.swing.JOptionPane;
  */
 public class Main_Window extends javax.swing.JFrame {
     
+    String ImagePath = null;
+    
     // Set Sql Connection
     public Connection getConnection(){
         Connection conn = null;
-        String url = "jdbc:mysql://localhost/xiaomi";
+        String url = "jdbc:mysql://localhost/javawithmysql";
         String user = "root";
         String password = "";
         try{
@@ -31,8 +45,42 @@ public class Main_Window extends javax.swing.JFrame {
         }
     }
     
+    
+    
+    // Resize Images ================
+    public ImageIcon ResizeImage(String imagePath, byte[] pic){
+        ImageIcon myImg = null;
+        if(imagePath != null){
+            myImg = new ImageIcon(imagePath);
+        }else{
+            myImg = new ImageIcon(pic);
+        }
+        Image img = myImg.getImage();
+        Image img2 = img.getScaledInstance(imgBox.getWidth(), imgBox.getHeight(), Image.SCALE_SMOOTH);
+        ImageIcon image = new ImageIcon(img2);
+        return image;
+    }
+    
+    
+    // Check Input FIelds
+    public boolean checkInputs(){
+        if(idTextField.getText() == null || nameTextField.getText() == null || priceTextField.getText() == null || dateField.getDate() == null){
+            return false;
+        }else{
+            try{
+               Float.parseFloat(priceTextField.getText());
+               return true;
+            }catch(Exception e){
+                return false;
+            }
+        }
+    }
+    
+    
+    
     public Main_Window() {
         initComponents();
+        // This Method Write here check connected database purpose
         getConnection();
     }
 
@@ -54,11 +102,11 @@ public class Main_Window extends javax.swing.JFrame {
         idTextField = new javax.swing.JTextField();
         nameTextField = new javax.swing.JTextField();
         priceTextField = new javax.swing.JTextField();
-        jDateChooser1 = new com.toedter.calendar.JDateChooser();
-        jLabel6 = new javax.swing.JLabel();
+        dateField = new com.toedter.calendar.JDateChooser();
+        imgBox = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
+        chooseBtn = new javax.swing.JButton();
         insertBtn = new javax.swing.JButton();
         updateBtn = new javax.swing.JButton();
         deleteBtn = new javax.swing.JButton();
@@ -88,6 +136,11 @@ public class Main_Window extends javax.swing.JFrame {
 
         idTextField.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         idTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        idTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                idTextFieldActionPerformed(evt);
+            }
+        });
 
         nameTextField.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         nameTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -95,11 +148,11 @@ public class Main_Window extends javax.swing.JFrame {
         priceTextField.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         priceTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
-        jDateChooser1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        dateField.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
 
-        jLabel6.setBackground(new java.awt.Color(204, 255, 255));
-        jLabel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jLabel6.setOpaque(true);
+        imgBox.setBackground(new java.awt.Color(204, 255, 255));
+        imgBox.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        imgBox.setOpaque(true);
 
         jTable1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -113,11 +166,21 @@ public class Main_Window extends javax.swing.JFrame {
         jTable1.setEditingColumn(4);
         jScrollPane1.setViewportView(jTable1);
 
-        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton1.setText("Choose Image");
+        chooseBtn.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        chooseBtn.setText("Choose Image");
+        chooseBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chooseBtnActionPerformed(evt);
+            }
+        });
 
         insertBtn.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         insertBtn.setText("Insert");
+        insertBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                insertBtnActionPerformed(evt);
+            }
+        });
 
         updateBtn.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         updateBtn.setText("Update");
@@ -153,9 +216,9 @@ public class Main_Window extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(chooseBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(dateField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(imgBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(priceTextField)
                             .addComponent(nameTextField)
                             .addComponent(idTextField))
@@ -199,13 +262,13 @@ public class Main_Window extends javax.swing.JFrame {
                         .addGap(18, 18, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
-                            .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(dateField, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel5)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(imgBox, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(26, 26, 26)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(chooseBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1))
                 .addGap(69, 69, 69)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -238,6 +301,56 @@ public class Main_Window extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void chooseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseBtnActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+        
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("*.images", "jpg","png");
+        fileChooser.addChoosableFileFilter(filter);
+        int result = fileChooser.showSaveDialog(null);
+        if(result == JFileChooser.APPROVE_OPTION){
+            File selectedFile = fileChooser.getSelectedFile();
+            String path = selectedFile.getAbsolutePath();
+            imgBox.setIcon(ResizeImage(path, null));
+            ImagePath = path;
+        }else{
+            System.out.println("No File Selected");
+        }
+    }//GEN-LAST:event_chooseBtnActionPerformed
+
+    
+    
+    
+    
+    private void idTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idTextFieldActionPerformed
+        
+    }//GEN-LAST:event_idTextFieldActionPerformed
+
+    private void insertBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertBtnActionPerformed
+        if(checkInputs() && ImagePath != null){
+            try {
+                Connection conn = getConnection();
+                PreparedStatement ps = (PreparedStatement) conn.prepareStatement("INSERT INTO products(id,name,price,add_date,image)"
+                        + "VALUES(?,?,?,?,?)");
+                ps.setString(1, idTextField.getText());
+                ps.setString(2, nameTextField.getText());
+                ps.setString(3, priceTextField.getText());
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                String addDate = dateFormat.format(dateField.getDate());
+                ps.setString(4, addDate);
+                InputStream img = new FileInputStream(new File(ImagePath));
+                ps.setBlob(5, img);
+                ps.executeUpdate();
+                
+                JOptionPane.showMessageDialog(null, "Data Inserted");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage());
+            }
+        }else{
+            JOptionPane.showMessageDialog(null, "One or More Field Are Empty");
+        }
+    }//GEN-LAST:event_insertBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -275,18 +388,18 @@ public class Main_Window extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton chooseBtn;
+    private com.toedter.calendar.JDateChooser dateField;
     private javax.swing.JButton deleteBtn;
     private javax.swing.JButton firstBtn;
     private javax.swing.JTextField idTextField;
+    private javax.swing.JLabel imgBox;
     private javax.swing.JButton insertBtn;
-    private javax.swing.JButton jButton1;
-    private com.toedter.calendar.JDateChooser jDateChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
