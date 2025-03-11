@@ -1,5 +1,6 @@
 package myapp.with.mysql;
 import com.mysql.jdbc.PreparedStatement;
+import java.awt.HeadlessException;
 import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,8 +10,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -68,9 +67,9 @@ public class Main_Window extends javax.swing.JFrame {
             return false;
         }else{
             try{
-               Float.parseFloat(priceTextField.getText());
+               Float.valueOf(priceTextField.getText());
                return true;
-            }catch(Exception e){
+            }catch(NumberFormatException e){
                 return false;
             }
         }
@@ -344,7 +343,7 @@ public class Main_Window extends javax.swing.JFrame {
                 ps.executeUpdate();
                 
                 JOptionPane.showMessageDialog(null, "Data Inserted");
-            } catch (Exception ex) {
+            } catch (HeadlessException | FileNotFoundException | SQLException ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage());
             }
         }else{
