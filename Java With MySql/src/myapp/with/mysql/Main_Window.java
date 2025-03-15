@@ -42,7 +42,8 @@ public class Main_Window extends javax.swing.JFrame {
             return null;
         }
     }
-
+    
+    
     // Resize Images ================
     public ImageIcon ResizeImage(String imagePath, byte[] pic) {
         ImageIcon myImg = null;
